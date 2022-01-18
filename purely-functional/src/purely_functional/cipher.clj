@@ -66,26 +66,30 @@
        c)
      pos]))
 
+(defn- encoder
+  [out c]
+  (let [[coded-char offset] (cipher-char c out positive-offset-char)]
+    {:encoded (conj (:encoded out) coded-char)
+     :offset offset}))
+
 (defn encode
   [plaintext]
   (if (> (count plaintext) 1)
-    (->> (reduce (fn [out c]
-                   (let [[coded-char offset] (cipher-char c out positive-offset-char)]
-                     {:encoded (conj (:encoded out) coded-char)
-                      :offset offset}))
-                 {:encoded [] :offset nil} plaintext)
+    (->> (reduce encoder {:encoded [] :offset nil} plaintext)
          (:encoded)
          (apply str))
     plaintext))
 
+(defn- decoder
+  [out c]
+  (let [[decoded-char _] (cipher-char c out negative-offset-char)]
+    {:decoded (conj (:decoded out) decoded-char)
+     :offset (get-in alpha-map [(case-key c) decoded-char])}))
+
 (defn decode
   [encoded]
   (if (> (count encoded) 1)
-    (->> (reduce (fn [out c]
-                   (let [[decoded-char _] (cipher-char c out negative-offset-char)]
-                     {:decoded (conj (:decoded out) decoded-char)
-                      :offset (get-in alpha-map [(case-key c) decoded-char])}))
-                 {:decoded [] :offset nil} encoded)
+    (->> (reduce decoder {:decoded [] :offset nil} encoded)
          (:decoded)
          (apply str))
     encoded))
