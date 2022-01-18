@@ -1,0 +1,22 @@
+Write a program that outputs the score of a bowling game given a valid sequence of rolls.
+
+- You do not need to validate the input
+- You do not need to implement the game - you're calculating the scores after the game has been completed
+The Game
+
+- The bowling game consists of 10 frames(turns).
+- In each frame the player has two rolls(tries) to knock down 10 pins.
+- If the player knocks down all 10 pins in one roll, the frame is then completed with a single roll.
+- The score for the frame is the total number of pins knocked down plus bonuses.
+
+Bonuses :
+
+- A **spare** is when the player knocks down all 10 pins in two rolls. The bonus for that frame is the number of pins knocked down by the next roll.
+- A **strike** is when the player knocks down all 10 pins on his first roll. The bonus for that frame is the value of the next two rolls
+- **Tenth Frame bonus**: the player is allowed to roll one extra ball for a **spare**, or two extra balls for a **strike** rolled in the tenth frame. Note that rolling another strike does not award any additional rolls and that the total number of rolls in this frame must not exceed 3.
+
+Questions:
+
+Get the data as a data structure (not implementing game)?
+-
+bonus means, e.g., for spare, first roll of next frame is added to score
