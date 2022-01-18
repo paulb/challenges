@@ -59,38 +59,35 @@
 (defn encode
   [plaintext]
   (if (> (count plaintext) 1)
-    (loop [c (first plaintext)
-           plaintext* (next plaintext)
-           encoded []
-           offset nil]
-      (let [case-key* (case-key c)
-            pos (get-in alpha-map [case-key* c])
-            coded-char (if (and pos offset)
-                         (positive-offset-char c pos offset case-key*)
-                         c)
-            encoded (conj encoded coded-char)]
-        (if (seq plaintext*)
-          (recur (first plaintext*) (next plaintext*) encoded pos)
-          (apply str encoded))))
+    (->> (reduce (fn [out c]
+                   (let [case-key* (case-key c)
+                         pos (get-in alpha-map [case-key* c])
+                         offset (:offset out)
+                         coded-char (if (and pos offset)
+                                      (positive-offset-char c pos offset case-key*)
+                                      c)]
+                     {:encoded (conj (:encoded out) coded-char)
+                      :offset pos}))
+                 {:encoded [] :offset nil} plaintext)
+         (:encoded)
+         (apply str))
     plaintext))
 
 (defn decode
   [encoded]
   (if (> (count encoded) 1)
-    (loop [c (first encoded)
-           encoded* (next encoded)
-           decoded []
-           offset nil]
-      (let [case-key* (case-key c)
-            pos (get-in alpha-map [case-key* c])
-            decoded-char (if (and pos offset)
-                           (negative-offset-char c pos offset case-key*)
-                           c)
-            decoded (conj decoded decoded-char)
-            offset (get-in alpha-map [case-key* decoded-char])]
-        (if (seq encoded*)
-          (recur (first encoded*) (next encoded*) decoded offset)
-          (apply str decoded))))
+    (->> (reduce (fn [out c]
+                   (let [case-key* (case-key c)
+                         pos (get-in alpha-map [case-key* c])
+                         offset (:offset out)
+                         decoded-char (if (and pos offset)
+                                        (negative-offset-char c pos offset case-key*)
+                                        c)]
+                     {:decoded (conj (:decoded out) decoded-char)
+                      :offset (get-in alpha-map [case-key* decoded-char])}))
+                 {:decoded [] :offset nil} encoded)
+         (:decoded)
+         (apply str))
     encoded))
 
 ;; Test cases.
