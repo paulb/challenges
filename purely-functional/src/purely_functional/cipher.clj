@@ -74,11 +74,9 @@
 
 (defn encode
   [plaintext]
-  (if (> (count plaintext) 1)
-    (->> (reduce encoder {:encoded [] :offset nil} plaintext)
-         (:encoded)
-         (apply str))
-    plaintext))
+  (->> (reduce encoder {:encoded [] :offset nil} plaintext)
+       (:encoded)
+       (apply str)))
 
 (defn- decoder
   [out c]
@@ -88,11 +86,9 @@
 
 (defn decode
   [encoded]
-  (if (> (count encoded) 1)
-    (->> (reduce decoder {:decoded [] :offset nil} encoded)
-         (:decoded)
-         (apply str))
-    encoded))
+  (->> (reduce decoder {:decoded [] :offset nil} encoded)
+       (:decoded)
+       (apply str)))
 
 ;; Test cases.
 
