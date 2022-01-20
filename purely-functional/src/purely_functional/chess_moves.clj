@@ -50,7 +50,9 @@
   (let [{:keys [direction count] :as move*} (move start destination)]
     (prn :move move*)
     ;; TODO Ensure within boundaries of board.
-    (boolean (some #(= move* %) (rules piece)))))
+    (boolean (some #(and (= (:direction move*) (:direction %))
+                         (<= (:count move*) (:count %)))
+                   (rules piece)))))
 
 ;; Tests
 ;; TODO More (including no move?)
@@ -73,7 +75,8 @@
 
 (defn queen-can-move-diagonally
   []
-  (assert (= (can-move? :queen "H1" "A8") true)))
+  (assert (= (can-move? :queen "H1" "A8") true))
+  (assert (= (can-move? :queen "A1" "C3") true)))
 
 (defn knight-cannot-move-forward
   []
