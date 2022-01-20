@@ -13,6 +13,7 @@
 
 (def ^:private rows [\A \B \C \D \E \F \G \H])
 (def ^:private columns [\1 \2 \3 \4 \5 \6 \7 \8])
+(def ^:private boundaries (set (concat rows columns)))
 
 (def ^:private board
   (set (for [row rows
@@ -23,7 +24,12 @@
   {:pawn #{{:direction :forward :count 1}}
    :queen #{{:direction :forward :count 7}
             {:direction :backward :count 7}
-            {:direction :diagonal :count 7}}})
+            {:direction :sideways :count 7}
+            {:direction :diagonal :count 7}}
+   :king #{{:direction :forward :count 1}
+           {:direction :backward :count 1}
+           {:direction :sideways :count 1}
+           {:direction :diagonal :count 1}}})
 
 (defn- move
   [start destination]
@@ -31,8 +37,6 @@
         columns (map int columns)
         rows (map #(Character/digit % 10) rows)
         move-count (- (second rows) (first rows))]
-    (prn :columns columns)
-    (prn :columns rows)
     {:direction ;; if a to a, forward or backward depending on count pos or neg.
                 ;; if a to b, sideways or diagonal forward/backward depending.
                 ;; currently assumes a move of some kind, staying in place will fail.
@@ -47,12 +51,13 @@
 
 (defn can-move?
   [piece start destination]
-  (let [{:keys [direction count] :as move*} (move start destination)]
-    (prn :move move*)
-    ;; TODO Ensure within boundaries of board.
-    (boolean (some #(and (= (:direction move*) (:direction %))
-                         (<= (:count move*) (:count %)))
-                   (rules piece)))))
+  (let [{:keys [direction count] :as move*} (move start destination)
+        [column row] destination]
+    (boolean (and (boundaries column)
+                  (boundaries row)
+                  (some #(and (= (:direction move*) (:direction %))
+                              (<= (:count move*) (:count %)))
+                        (rules piece))))))
 
 ;; Tests
 ;; TODO More (including no move?)
